@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: ashiqa/ashiq-ar-devops-workflow-practice-frontend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+# Env values based on .env.example
+env:
+  VITE_API_HOST: "http://localhost"
+  VITE_API_PORT: "8000"
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
