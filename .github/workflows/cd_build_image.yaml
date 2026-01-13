@@ -1,0 +1,64 @@
+# Manual workflow to build and push Docker images to Docker Hub
+# Requires repository secrets: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN
+
+name: Build and Push Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Which service to build (frontend or backend)"
+        required: true
+        default: "backend"
+        type: choice
+        options:
+          - frontend
+          - backend
+      tag:
+        description: "Image tag (default: latest)"
+        required: false
+        default: "latest"
+
+concurrency:
+  group: build-image-${{ github.ref }}-${{ github.event.inputs.service }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    name: Build & Push ${{ github.event.inputs.service }} image
+    runs-on: ubuntu-latest
+    env:
+      SERVICE: ${{ github.event.inputs.service }}
+      TAG: ${{ github.event.inputs.tag || 'latest' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (cross-platform builds)
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub 🔐
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image 🚀
+        id: build
+        uses: docker/build-push-action@v4
+        with:
+          context: ./${{ env.SERVICE }}
+          file: ./${{ env.SERVICE }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ replace(github.repository, '/', '-') }}-${{ env.SERVICE }}:${{ env.TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ replace(github.repository, '/', '-') }}-${{ env.SERVICE }}:latest
+
+      - name: Output pushed image names ✅
+        run: |
+          echo "Image pushed: ${{ secrets.DOCKERHUB_USERNAME }}/$(echo $GITHUB_REPOSITORY | sed -e 's|/|-|g')-${{ env.SERVICE }}:${{ env.TAG }}"
