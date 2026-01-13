@@ -47,6 +47,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Convert repo info to lowercase
+        run: |
+          echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "Using image name: $IMAGE_NAME"
+
       - name: Build and push image 🚀
         id: build
         uses: docker/build-push-action@v4
@@ -56,8 +61,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}:${{ env.TAG }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Output pushed image names ✅
         run: |
