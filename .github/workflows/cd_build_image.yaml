@@ -56,9 +56,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ replace(github.repository, '/', '-') }}-${{ env.SERVICE }}:${{ env.TAG }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ replace(github.repository, '/', '-') }}-${{ env.SERVICE }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}:${{ env.TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}:latest
 
       - name: Output pushed image names ✅
         run: |
-          echo "Image pushed: ${{ secrets.DOCKERHUB_USERNAME }}/$(echo $GITHUB_REPOSITORY | sed -e 's|/|-|g')-${{ env.SERVICE }}:${{ env.TAG }}"
+          echo "Image pushed: ${{ secrets.DOCKERHUB_USERNAME }}/${GITHUB_REPOSITORY_OWNER}-${GITHUB_REPOSITORY#*/}-${{ env.SERVICE }}:${{ env.TAG }}"
