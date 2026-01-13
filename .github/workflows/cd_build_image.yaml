@@ -50,7 +50,6 @@ jobs:
       - name: Convert repo info to lowercase
         run: |
           echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "Using image name: $IMAGE_NAME"
 
       - name: Build and push image 🚀
         id: build
@@ -66,4 +65,4 @@ jobs:
 
       - name: Output pushed image names ✅
         run: |
-          echo "Image pushed: ${{ secrets.DOCKERHUB_USERNAME }}/${GITHUB_REPOSITORY_OWNER}-${GITHUB_REPOSITORY#*/}-${{ env.SERVICE }}:${{ env.TAG }}"
+          echo "Image pushed: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}"
