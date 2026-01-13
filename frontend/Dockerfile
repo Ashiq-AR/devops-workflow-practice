@@ -10,20 +10,24 @@ RUN npm ci
 
 COPY . .
 
-RUN chmod +x node_modules/.bin/*
+# RUN chmod +x node_modules/.bin/*
 
 RUN npm run build
 
 # Stage 2: Run the build
 
-FROM registry.redhat.io/ubi9/nginx-120
+# FROM registry.redhat.io/ubi9/nginx-120
+FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/nginx.conf
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN chmod -R g+rX /usr/share/nginx/html
+# RUN chmod -R g+rX /usr/share/nginx/html
 
-EXPOSE 8080
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
