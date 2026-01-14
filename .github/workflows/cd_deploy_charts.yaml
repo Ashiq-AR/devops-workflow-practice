@@ -6,16 +6,17 @@ on:
       openshift_server:
         description: "OpenShift Server URL"
         required: true
+        default: "https://api.rm1.0a51.p1.openshiftapps.com:6443"
         type: string
       openshift_namespace:
         description: "OpenShift Namespace/Project"
         required: true
-        default: "default"
+        default: "ashiq16102002-dev"
         type: string
       helm_release_name_prefix:
         description: "Helm Release Name Prefix"
         required: false
-        default: "myapp"
+        default: "mynotesapp"
         type: string
 
 env:
@@ -58,7 +59,6 @@ jobs:
             ${{ inputs.helm_release_name_prefix }}-database \
             ./database/chart \
             --namespace ${{ inputs.openshift_namespace }} \
-            --create-namespace \
             --wait \
             --timeout 5m
         continue-on-error: false
