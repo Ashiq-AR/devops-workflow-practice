@@ -1,5 +1,5 @@
 apiVersion: v2
-name: backend
+name: notesapp-backend
 description: Helm chart for the backend application
 type: application
 version: 0.1.0

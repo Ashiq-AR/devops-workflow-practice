@@ -16,10 +16,10 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ if .Values.isOpenShift }}{{ .Values.image.repository }}-openshift{{ else }}{{ .Values.image.repository }}{{ end }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: {{ include "frontend.fullname" . }}-env

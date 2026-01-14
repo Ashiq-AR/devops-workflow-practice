@@ -9,14 +9,17 @@ service:
   type: ClusterIP
   port: 8000
 
+# Set to true to create an OpenShift Route
+isOpenShift: true
+
 # Postgres connection defaults (matches backend/models.py)
 postgres:
   # Default host points to a Database chart installed with release name 'database'
   # If you install the database chart with a different release name, override this value.
-  host: "my-database"
+  host: "database"
   port: "5432"
   db: "notesdb"
-  user: "postgres"
+  user: "notesappuser"
   password: "admin"
 
 resources: {}

@@ -10,9 +10,11 @@ service:
   port: 5432
 
 postgres:
-  user: "postgres"
+  user: "notesappuser"
   password: "admin"
   db: "notesdb"
+
+isOpenShift: true
 
 # Use emptyDir by default; for production replace with a PVC
 persistence:

@@ -1,4 +1,4 @@
-{{- if not .Values.isOpenShift }}
+{{- if .Values.isOpenShift }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -8,39 +8,23 @@ metadata:
 spec:
   containers:
     - name: postgres
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      image: registry.redhat.io/rhel9/postgresql-15
       imagePullPolicy: {{ .Values.image.pullPolicy }}
       ports:
         - containerPort: 5432
       env:
-        - name: POSTGRES_DB
-          value: {{ .Values.postgres.db | quote }}
-        - name: POSTGRES_USER
+        - name: POSTGRESQL_USER
           value: {{ .Values.postgres.user | quote }}
-        - name: POSTGRES_PASSWORD
+        - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database.fullname" . }}-db
               key: POSTGRES_PASSWORD
+        - name: POSTGRESQL_DATABASE
+          value: {{ .Values.postgres.db | quote }}
       volumeMounts:
-        - mountPath: /var/lib/postgresql/data
+        - mountPath: /var/lib/pgsql/data
           name: pgdata
-      readinessProbe:
-        exec:
-          command:
-            - sh
-            - -c
-            - pg_isready -U {{ .Values.postgres.user | quote }}
-        initialDelaySeconds: 5
-        periodSeconds: 10
-      livenessProbe:
-        exec:
-          command:
-            - sh
-            - -c
-            - pg_isready -U {{ .Values.postgres.user | quote }}
-        initialDelaySeconds: 30
-        periodSeconds: 10
   volumes:
     - name: pgdata
       {{- if .Values.persistence.enabled }}
