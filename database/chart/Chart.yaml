@@ -1,0 +1,7 @@
+apiVersion: v2
+name: database
+description: Helm chart to run a single Postgres Pod for development/testing
+type: application
+version: 0.1.0
+appVersion: "15"
+icon: "https://helm.sh/img/helm.svg"

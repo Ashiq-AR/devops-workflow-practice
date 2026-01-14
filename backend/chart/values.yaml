@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  repository: ashiqa/ashiq-ar-devops-workflow-practice-backend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+# Postgres connection defaults (matches backend/models.py)
+postgres:
+  # Default host points to a Database chart installed with release name 'database'
+  # If you install the database chart with a different release name, override this value.
+  host: "my-database"
+  port: "5432"
+  db: "notesdb"
+  user: "postgres"
+  password: "admin"
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

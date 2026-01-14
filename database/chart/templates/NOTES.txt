@@ -1,0 +1,8 @@
+1. Pod will start using the official Postgres image and will create the `notesdb` database automatically on first initialization if it doesn't exist.
+
+   Pod name: {{ include "database.fullname" . }}
+   Service name: {{ include "database.fullname" . }}
+
+2. Connect from other charts using the service name (e.g., if you install the chart as `database` in the same namespace, set `POSTGRES_HOST` / backend `postgres.host` to `database`).
+
+3. To provide a persistent volume, set `persistence.enabled=true` and create a PVC beforehand or configure storageClass/PVC templating.

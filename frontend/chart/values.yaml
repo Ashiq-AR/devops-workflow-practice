@@ -12,7 +12,8 @@ service:
 # Env values based on .env.example
 env:
   VITE_API_HOST: "http://localhost"
-  VITE_API_PORT: "8000"
+  # VITE_API_PORT: "8000"
+  VITE_API_PORT: "60488"
 
 resources: {}
 

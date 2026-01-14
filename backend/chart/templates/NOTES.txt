@@ -1,0 +1,12 @@
+1. Get the application endpoints by running these commands:
+
+  Release Name: {{ .Release.Name }}
+
+  If you installed with a ClusterIP service:
+    kubectl get svc {{ include "backend.fullname" . }}
+
+  If using a LoadBalancer service (set `service.type` to `LoadBalancer`):
+    kubectl get svc {{ include "backend.fullname" . }}
+
+2. Secrets created (do not store sensitive data in values.yaml in production):
+   Secret name: {{ include "backend.fullname" . }}-db

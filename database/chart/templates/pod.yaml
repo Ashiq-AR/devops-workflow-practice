@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "database.fullname" . }}
+  labels:
+    {{- include "database.labels" . | nindent 4 }}
+spec:
+  containers:
+    - name: postgres
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_DB
+          value: {{ .Values.postgres.db | quote }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgres.user | quote }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "database.fullname" . }}-db
+              key: POSTGRES_PASSWORD
+      volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: pgdata
+      readinessProbe:
+        exec:
+          command:
+            - sh
+            - -c
+            - pg_isready -U {{ .Values.postgres.user | quote }}
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        exec:
+          command:
+            - sh
+            - -c
+            - pg_isready -U {{ .Values.postgres.user | quote }}
+        initialDelaySeconds: 30
+        periodSeconds: 10
+  volumes:
+    - name: pgdata
+      {{- if .Values.persistence.enabled }}
+      persistentVolumeClaim:
+        claimName: {{ include "database.fullname" . }}-pvc
+      {{- else }}
+      emptyDir: {}
+      {{- end }}

@@ -1,0 +1,27 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "15"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5432
+
+postgres:
+  user: "postgres"
+  password: "admin"
+  db: "notesdb"
+
+# Use emptyDir by default; for production replace with a PVC
+persistence:
+  enabled: false
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
