@@ -11,7 +11,7 @@ RUN chmod +x node_modules/.bin/*
 RUN npm run build
 
 # Stage 2: Runtime
-FROM registry.redhat.io/ubi9/nginx-120
+FROM nginx:alpine
 
 # Main nginx config
 COPY openshift.nginx.conf /etc/nginx/nginx.conf
