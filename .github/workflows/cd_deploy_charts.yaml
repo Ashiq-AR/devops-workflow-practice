@@ -1,0 +1,107 @@
+name: CD - Deploy Charts to OpenShift
+
+on:
+  workflow_dispatch:
+    inputs:
+      openshift_server:
+        description: "OpenShift Server URL"
+        required: true
+        type: string
+      openshift_namespace:
+        description: "OpenShift Namespace/Project"
+        required: true
+        default: "default"
+        type: string
+      helm_release_name_prefix:
+        description: "Helm Release Name Prefix"
+        required: false
+        default: "myapp"
+        type: string
+
+env:
+  HELM_VERSION: "3.13.0"
+
+jobs:
+  deploy-to-openshift:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install OpenShift CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+          tar -xzf openshift-client-linux.tar.gz
+          sudo mv oc /usr/local/bin/
+          sudo chmod +x /usr/local/bin/oc
+          oc version --client
+
+      - name: Login to OpenShift
+        run: |
+          oc login ${{ inputs.openshift_server }} \
+            --token=${{ secrets.OPENSHIFT_TOKEN }} \
+            --insecure-skip-tls-verify=true
+          oc project ${{ inputs.openshift_namespace }}
+
+      - name: Install Helm
+        run: |
+          curl -LO https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          tar -xzf helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/
+          sudo chmod +x /usr/local/bin/helm
+          helm version
+
+      - name: Deploy Database Chart
+        run: |
+          helm upgrade --install \
+            ${{ inputs.helm_release_name_prefix }}-database \
+            ./database/chart \
+            --namespace ${{ inputs.openshift_namespace }} \
+            --create-namespace \
+            --wait \
+            --timeout 5m
+        continue-on-error: false
+
+      - name: Deploy Backend Chart
+        run: |
+          helm upgrade --install \
+            ${{ inputs.helm_release_name_prefix }}-backend \
+            ./backend/chart \
+            --namespace ${{ inputs.openshift_namespace }} \
+            --wait \
+            --timeout 5m
+        continue-on-error: false
+
+      - name: Deploy Frontend Chart
+        run: |
+          helm upgrade --install \
+            ${{ inputs.helm_release_name_prefix }}-frontend \
+            ./frontend/chart \
+            --namespace ${{ inputs.openshift_namespace }} \
+            --wait \
+            --timeout 5m
+        continue-on-error: false
+
+      - name: Verify Deployments
+        run: |
+          echo "=== Helm Releases ==="
+          helm list --namespace ${{ inputs.openshift_namespace }}
+
+          echo "=== Pods Status ==="
+          oc get pods --namespace ${{ inputs.openshift_namespace }}
+
+          echo "=== Services ==="
+          oc get services --namespace ${{ inputs.openshift_namespace }}
+
+          echo "=== Routes ==="
+          oc get routes --namespace ${{ inputs.openshift_namespace }}
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "✅ All charts deployed successfully!"
+          echo "📦 Database: ${{ inputs.helm_release_name_prefix }}-database"
+          echo "📦 Backend: ${{ inputs.helm_release_name_prefix }}-backend"
+          echo "📦 Frontend: ${{ inputs.helm_release_name_prefix }}-frontend"
+          echo "🌐 Namespace: ${{ inputs.openshift_namespace }}"
