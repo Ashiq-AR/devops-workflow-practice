@@ -14,13 +14,21 @@ on:
         options:
           - frontend
           - backend
+      cluster:
+        description: "Target cluster (common or openshift)"
+        required: true
+        default: "common"
+        type: choice
+        options:
+          - common
+          - openshift
       tag:
         description: "Image tag (default: latest)"
         required: false
         default: "latest"
 
 concurrency:
-  group: build-image-${{ github.ref }}-${{ github.event.inputs.service }}
+  group: build-image-${{ github.ref }}-${{ github.event.inputs.service }}-${{ github.event.inputs.cluster }}
   cancel-in-progress: true
 
 jobs:
@@ -29,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: ${{ github.event.inputs.service }}
+      CLUSTER: ${{ github.event.inputs.cluster }}
       TAG: ${{ github.event.inputs.tag || 'latest' }}
 
     steps:
@@ -49,14 +58,20 @@ jobs:
 
       - name: Convert repo info to lowercase
         run: |
-          echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          if [ "${{ env.CLUSTER }}" == "openshift" ]; then
+            echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}-openshift' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+            echo "DOCKERFILE=openshift.Dockerfile" >> $GITHUB_ENV
+          else
+            echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+            echo "DOCKERFILE=Dockerfile" >> $GITHUB_ENV
+          fi
 
       - name: Build and push image 🚀
         id: build
         uses: docker/build-push-action@v4
         with:
           context: ./${{ env.SERVICE }}
-          file: ./${{ env.SERVICE }}/Dockerfile
+          file: ./${{ env.SERVICE }}/${{ env.DOCKERFILE }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
