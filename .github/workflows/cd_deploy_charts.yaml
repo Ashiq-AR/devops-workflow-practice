@@ -16,7 +16,7 @@ on:
       helm_release_name_prefix:
         description: "Helm Release Name Prefix"
         required: false
-        default: "mynotesapp"
+        default: "notesapp"
         type: string
 
 env:
