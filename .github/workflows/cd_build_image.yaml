@@ -77,6 +77,8 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          build-args: |
+            ${{ env.SERVICE == 'frontend' && format('VITE_API_URL={0}', vars.VITE_API_URL) || '' }}
 
       - name: Output pushed image names ✅
         run: |

@@ -1,4 +1,4 @@
-export const API_URL = `${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}`;
+export const API_URL = import.meta.env.VITE_API_URL;
 
 // Logger utility for frontend
 const log = {
@@ -18,6 +18,8 @@ const log = {
     );
   },
 };
+
+log.info(`API_URL set to: ${API_URL}`);
 
 export async function getNotes() {
   log.info("API Call: Fetching all notes");
