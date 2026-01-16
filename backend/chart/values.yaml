@@ -16,7 +16,7 @@ isOpenShift: true
 postgres:
   # Default host points to a Database chart installed with release name 'database'
   # If you install the database chart with a different release name, override this value.
-  host: "database"
+  # host: "database"
   port: "5432"
   db: "notesdb"
   user: "notesappuser"
