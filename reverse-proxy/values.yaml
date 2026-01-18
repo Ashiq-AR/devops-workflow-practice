@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: alpine
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 81
+
+frontend:
+  serviceName: notesapp-frontend
+  servicePort: 80
+
+backend:
+  serviceName: notesapp-backend
+  servicePort: 8000
+
+route:
+  enabled: true
+  host: ""
+  tls:
+    enabled: false
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

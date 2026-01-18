@@ -1,0 +1,6 @@
+apiVersion: v2
+name: reverse-proxy
+description: NGINX reverse proxy in front of frontend and backend
+type: application
+version: 0.1.0
+appVersion: "1.0"
