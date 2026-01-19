@@ -61,7 +61,6 @@ jobs:
             --namespace ${{ inputs.openshift_namespace }} \
             --wait \
             --timeout 5m
-        continue-on-error: false
 
       - name: Deploy Backend Chart
         run: |
@@ -71,7 +70,6 @@ jobs:
             --namespace ${{ inputs.openshift_namespace }} \
             --wait \
             --timeout 5m
-        continue-on-error: false
 
       - name: Deploy Frontend Chart
         run: |
@@ -81,7 +79,15 @@ jobs:
             --namespace ${{ inputs.openshift_namespace }} \
             --wait \
             --timeout 5m
-        continue-on-error: false
+
+      - name: Deploy Reverse Proxy Chart
+        run: |
+          helm upgrade --install \
+            ${{ inputs.helm_release_name_prefix }}-reverse-proxy \
+            ./reverse-proxy \
+            --namespace ${{ inputs.openshift_namespace }} \
+            --wait \
+            --timeout 5m
 
       - name: Verify Deployments
         run: |
@@ -104,4 +110,5 @@ jobs:
           echo "📦 Database: ${{ inputs.helm_release_name_prefix }}-database"
           echo "📦 Backend: ${{ inputs.helm_release_name_prefix }}-backend"
           echo "📦 Frontend: ${{ inputs.helm_release_name_prefix }}-frontend"
+          echo "📦 Reverse Proxy: ${{ inputs.helm_release_name_prefix }}-reverse-proxy"
           echo "🌐 Namespace: ${{ inputs.openshift_namespace }}"
