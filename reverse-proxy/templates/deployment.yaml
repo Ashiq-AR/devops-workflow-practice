@@ -18,15 +18,10 @@ spec:
           ports:
             - containerPort: 8080
           volumeMounts:
-            - name: nginx-default-config
-              mountPath: /etc/nginx/conf.d
-            - name: nginx-nginx-config
+            - name: nginx-config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
       volumes:
-        - name: nginx-nginx-config
+        - name: nginx-config
           configMap:
-            name: {{ .Release.Name }}-nginx-nginx-config
-        - name: nginx-default-config
-          configMap:
-            name: {{ .Release.Name }}-nginx-default-config
+            name: {{ .Release.Name }}-nginx-config

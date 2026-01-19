@@ -29,10 +29,6 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Notes API",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
-    root_path="/api"
 )
 
 app.add_middleware(

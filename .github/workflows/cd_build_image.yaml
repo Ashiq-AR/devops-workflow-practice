@@ -60,7 +60,11 @@ jobs:
         run: |
           if [ "${{ env.CLUSTER }}" == "openshift" ]; then
             echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}-openshift' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-            echo "DOCKERFILE=openshift.Dockerfile" >> $GITHUB_ENV
+            if [ "${{ env.SERVICE }}" == "frontend" ]; then
+              echo "DOCKERFILE=openshift.Dockerfile" >> $GITHUB_ENV
+            else
+              echo "DOCKERFILE=Dockerfile" >> $GITHUB_ENV
+            fi
           else
             echo "IMAGE_NAME=$(echo '${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ env.SERVICE }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
             echo "DOCKERFILE=Dockerfile" >> $GITHUB_ENV
